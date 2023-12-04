@@ -1,11 +1,8 @@
 use regex::Regex;
-use std::fs;
+use adventOfCode2023::read_from_file;
 
 fn main() {
-    let file_path = "src/day2/input.txt";
-    let contents = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    let values: Vec<_> = contents.split('\n').collect();
-
+    let values = read_from_file("src/day2/input.txt");
 
     let limit = Set {
         green: Cube::Green(13),
@@ -25,7 +22,7 @@ struct Games {
 }
 
 impl Games {
-    pub fn play(values: Vec<&str>, limit: Set) -> Games {
+    pub fn play(values: Vec<String>, limit: Set) -> Games {
         let games: Vec<Game> = values
             .iter()
             .map(|game| { Game::new(game) })
@@ -80,7 +77,6 @@ struct Game {
     sets: Vec<Set>,
 }
 
-
 impl Game {
     pub fn new(game: &str) -> Self {
         let id_regex = Regex::new(r"Game (?P<game>\d+):").unwrap();
@@ -133,11 +129,11 @@ mod tests {
         };
 
         let games = vec![
-            "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green",
-            "Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue",
-            "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red",
-            "Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red",
-            "Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green",
+            String::from("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"),
+            String::from("Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue"),
+            String::from("Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red"),
+            String::from("Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red"),
+            String::from("Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"),
         ];
         let games = Games::play(games, limit);
 

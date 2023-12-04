@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 regex = { version = "1.10.2", features = [] }
 
+
 [[bin]]
 name = "day1"
 path = "src/day1/main.rs"
@@ -16,3 +17,12 @@ path = "src/day1/main.rs"
 name = "day2"
 path = "src/day2/main.rs"
 
+
+[[bin]]
+name = "day3"
+path = "src/day3/main.rs"
+
+
+[[bin]]
+name = "day4"
+path = "src/day4/main.rs"

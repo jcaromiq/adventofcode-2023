@@ -1,16 +1,13 @@
 use std::fs;
+use adventOfCode2023::read_from_file;
 
 fn main() {
-    let file_path = "src/day1/input.txt";
-
-    let contents = fs::read_to_string(file_path).expect("Should have been able to read the file");
-
-    let calibrations = contents.split('\n').collect();
+    let calibrations = read_from_file("src/day1/input.txt");
     let value = calibration_sum(calibrations);
     println!("{value}");
 }
 
-fn calibration_sum(calibrations: Vec<&str>) -> usize {
+fn calibration_sum(calibrations: Vec<String>) -> usize {
     calibrations
         .iter()
         .map(|value| calibration_value(value))
@@ -91,7 +88,13 @@ mod tests {
 
     #[test]
     fn get_calibration_sum_of_statement() {
-        let calibrations = vec!["1abc2", "pqr3stu8vwx", "a1b2c3d4e5f", "treb7uchet"];
+        let calibrations = vec![
+            String::from("1abc2"),
+            String::from("pqr3stu8vwx"),
+            String::from("a1b2c3d4e5f"),
+            String::from("treb7uchet"),
+        ];
+
 
         let value = calibration_sum(calibrations);
 
@@ -101,13 +104,13 @@ mod tests {
     #[test]
     fn get_calibration_sum_of_statement_spelled_out_with_letters() {
         let calibrations = vec![
-            "two1ninetwo",
-            "eightwothree",
-            "abcone2threexyz",
-            "xtwone3four",
-            "4nineeightseven2",
-            "zoneight234",
-            "7pqrstsixteen",
+            String::from("two1ninetwo"),
+            String::from("eightwothree"),
+            String::from("abcone2threexyz"),
+            String::from("xtwone3four"),
+            String::from("4nineeightseven2"),
+            String::from("zoneight234"),
+            String::from("7pqrstsixteen"),
         ];
 
         let value = calibration_sum(calibrations);
