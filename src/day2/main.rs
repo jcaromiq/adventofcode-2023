@@ -6,7 +6,14 @@ fn main() {
     let contents = fs::read_to_string(file_path).expect("Should have been able to read the file");
     let values: Vec<_> = contents.split('\n').collect();
 
-    let games = Games::play(values);
+
+    let limit = Set {
+        green: Cube::Green(13),
+        red: Cube::Red(12),
+        blue: Cube::Blue(14),
+    };
+
+    let games = Games::play(values, limit);
 
     println!("{:?}", games.sum_of_possible_games_ids());
 }
@@ -14,31 +21,30 @@ fn main() {
 
 struct Games {
     games: Vec<Game>,
+    limit: Set,
 }
 
 impl Games {
-    pub fn play(values: Vec<&str>) -> Games {
+    pub fn play(values: Vec<&str>, limit: Set) -> Games {
         let games: Vec<Game> = values
             .iter()
-            .map(|game| {
-                Game::new(
-                    game,
-                    &Set {
-                        green: Cube::Green(13),
-                        red: Cube::Red(12),
-                        blue: Cube::Blue(14),
-                    },
-                )
-            })
-            .filter(|g| g.is_possible())
+            .map(|game| { Game::new(game) })
             .collect();
         Games {
             games,
+            limit,
         }
     }
-    pub fn sum_of_possible_games_ids(&self) -> usize {
-        let ids: usize = self.games.iter().map(|g| g.id).sum();
-        ids
+
+    pub fn sum_of_possible_games_ids(self) -> usize {
+        let v = self.games.iter().filter(|v| {
+            v.sets.iter().filter(|c| {
+                !c.is_valid(&self.limit)
+            }).count() == 0
+        })
+            .map(|g| g.id)
+            .sum();
+        v
     }
 }
 
@@ -57,30 +63,26 @@ struct Set {
 }
 
 impl Set {
-    pub fn new(red: Cube, blue: Cube, green: Cube, limit: &Set) -> Option<Self> {
-        if red <= limit.red && blue <= limit.blue && green <= limit.green {
-            Some(Set { red, blue, green })
-        } else {
-            None
+    pub fn new(red: Cube, blue: Cube, green: Cube) -> Self {
+        Set { red, blue, green }
+    }
+    pub fn is_valid(&self, limit: &Set) -> bool {
+        if self.red <= limit.red && self.blue <= limit.blue && self.green <= limit.green {
+            return true;
         }
+        return false;
     }
 }
 
 #[derive(Debug)]
 struct Game {
     id: usize,
-    sets: Vec<Option<Set>>,
+    sets: Vec<Set>,
 }
 
-impl Game {
-    pub fn is_possible(&self) -> bool {
-        let v: Vec<_> = self.sets.iter().filter(|v| v.is_none()).collect();
-        v.is_empty()
-    }
-}
 
 impl Game {
-    pub fn new(game: &str, bag_limit: &Set) -> Self {
+    pub fn new(game: &str) -> Self {
         let id_regex = Regex::new(r"Game (?P<game>\d+):").unwrap();
         let id = id_regex
             .captures(game)
@@ -90,7 +92,7 @@ impl Game {
             .as_str()
             .parse::<usize>()
             .unwrap();
-        let sets: Vec<Option<Set>> = game
+        let sets: Vec<Set> = game
             .split(';')
             .map(|s| {
                 let red = Game::extract_value(s, "red");
@@ -100,7 +102,6 @@ impl Game {
                     Cube::Red(red),
                     Cube::Blue(blue),
                     Cube::Green(green),
-                    bag_limit,
                 )
             })
             .collect();
@@ -121,10 +122,16 @@ impl Game {
 
 #[cfg(test)]
 mod tests {
-    use crate::Games;
+    use crate::{Cube, Games, Set};
 
     #[test]
-    fn test() {
+    fn should_get_sum_of_all_possible_games_ids() {
+        let limit = Set {
+            green: Cube::Green(13),
+            red: Cube::Red(12),
+            blue: Cube::Blue(14),
+        };
+
         let games = vec![
             "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green",
             "Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue",
@@ -132,7 +139,7 @@ mod tests {
             "Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red",
             "Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green",
         ];
-        let games = Games::play(games);
+        let games = Games::play(games, limit);
 
         let ids: usize = games.sum_of_possible_games_ids();
 
