@@ -47,7 +47,7 @@ impl Game {
             .count();
         match matches {
             0 => 0,
-            i => (1..=i).reduce(|acc, e| acc*2).unwrap()
+            i => (1..=i).reduce(|acc, _| acc*2).unwrap()
         }
     }
 
@@ -58,7 +58,6 @@ impl Game {
             .name(x)
             .unwrap()
             .as_str()
-            .trim()
             .split_whitespace()
             .filter_map(|s| s.parse().ok())
             .collect();

@@ -64,10 +64,7 @@ impl Set {
         Set { red, blue, green }
     }
     pub fn is_valid(&self, limit: &Set) -> bool {
-        if self.red <= limit.red && self.blue <= limit.blue && self.green <= limit.green {
-            return true;
-        }
-        return false;
+        self.red <= limit.red && self.blue <= limit.blue && self.green <= limit.green
     }
 }
 

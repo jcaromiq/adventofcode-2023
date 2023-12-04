@@ -1,4 +1,3 @@
-use std::fs;
 use adventOfCode2023::read_from_file;
 
 fn main() {
